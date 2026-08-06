@@ -1,0 +1,2 @@
+export type Account = { id: string; name: string; balance: number; createdAt: string };
+export type Trade = { id: string; accountId: string; balance: number; date: string; weekday: string; session: "Asia"|"London"|"New York"; symbol: string; position: "Long"|"Short"; risk: number; rr: number; pl: number; lots: number; outcome: "Win"|"Loss"|"Break even"; entryTime: string; exitTime: string; emotion: string; preTrade: string; postTrade: string; screenshot: string; createdAt: string; updatedAt: string };
