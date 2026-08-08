@@ -3,7 +3,7 @@ import { ArrowRight, BarChart3, CalendarDays, Check, LineChart, ShieldCheck, Spa
 
 export default function LandingPage() {
   return <main className="landing">
-    <nav className="landing-nav shell"><Link href="/" className="brand"><span>EL</span> EdgeLog</Link><div><Link href="/login" className="nav-link">Log in</Link><Link href="/register" className="button small">Start journaling</Link></div></nav>
+    <nav className="landing-nav shell"><Link href="/" className="brand"><span>TT</span> Trade Tracker</Link><div><Link href="/login" className="nav-link">Log in</Link><Link href="/register" className="button small">Start journaling</Link></div></nav>
     <section className="hero shell">
       <div className="eyebrow"><Sparkles size={14}/> Built for deliberate traders</div>
       <h1>Trade with a plan.<br/><em>Improve with evidence.</em></h1>
@@ -20,8 +20,8 @@ export default function LandingPage() {
       <article><CalendarDays/><h3>Calendar review</h3><p>Spot green streaks, red days, and the habits behind your results.</p></article>
       <article><ShieldCheck/><h3>Focused account tracking</h3><p>Keep one trading account and its complete performance history organized.</p></article>
     </div></section>
-    <section className="why shell"><div><small>A BETTER REVIEW LOOP</small><h2>Your edge is already in your trades.</h2><p>EdgeLog turns scattered executions into a clear feedback loop. Capture context while it is fresh, review without bias, and carry the lesson into the next session.</p><ul><li><Check/>Document decisions, not just outcomes</li><li><Check/>Find patterns across sessions and symbols</li><li><Check/>Build consistency through honest review</li></ul></div><div className="quote-card"><LineChart/><blockquote>“What gets measured gets improved.”</blockquote><p>Make every trade part of the process.</p></div></section>
+    <section className="why shell"><div><small>A BETTER REVIEW LOOP</small><h2>Your edge is already in your trades.</h2><p>Trade Tracker turns scattered executions into a clear feedback loop. Capture context while it is fresh, review without bias, and carry the lesson into the next session.</p><ul><li><Check/>Document decisions, not just outcomes</li><li><Check/>Find patterns across sessions and symbols</li><li><Check/>Build consistency through honest review</li></ul></div><div className="quote-card"><LineChart/><blockquote>“What gets measured gets improved.”</blockquote><p>Make every trade part of the process.</p></div></section>
     <section className="cta shell"><small>YOUR NEXT TRADE STARTS HERE</small><h2>Build the discipline your strategy deserves.</h2><Link href="/register" className="button">Create your free account <ArrowRight size={17}/></Link></section>
-    <footer className="shell"><Link href="/" className="brand"><span>EL</span> EdgeLog</Link><p>© 2026 EdgeLog. Built for better decisions.</p></footer>
+    <footer className="shell"><Link href="/" className="brand"><span>TT</span> Trade Tracker</Link><p>© 2026 Trade Tracker. Built for better decisions.</p></footer>
   </main>
 }

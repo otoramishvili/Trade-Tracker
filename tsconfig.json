@@ -43,6 +43,7 @@
     "db",
     "examples",
     "tests",
+    "work",
     "vite.config.ts",
     "drizzle.config.ts"
   ]

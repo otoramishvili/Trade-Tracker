@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile, type User } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db, firebaseReady } from "@/firebase/config";
 
@@ -9,8 +9,18 @@ const AuthContext=createContext<AuthValue|null>(null);
 export function AuthProvider({children}:{children:React.ReactNode}){
  const [user,setUser]=useState<User|null>(null); const [loading,setLoading]=useState(firebaseReady);
  useEffect(()=>firebaseReady?onAuthStateChanged(auth,u=>{setUser(u);setLoading(false)}):undefined,[]);
- const login=async(email:string,password:string)=>{await signInWithEmailAndPassword(auth,email,password)};
- const register=async(email:string,password:string,name:string)=>{const c=await createUserWithEmailAndPassword(auth,email,password);await setDoc(doc(db,"users",c.user.uid),{email,name,createdAt:new Date().toISOString()})};
+ const login=async(email:string,password:string)=>{const credential=await signInWithEmailAndPassword(auth,email,password);setUser(credential.user)};
+ const register=async(email:string,password:string,name:string)=>{
+  const credential=await createUserWithEmailAndPassword(auth,email,password);
+  await updateProfile(credential.user,{displayName:name});
+  setUser(credential.user);
+  const now=new Date().toISOString();
+  try{
+   await setDoc(doc(db,"users",credential.user.uid),{email,name,onboardingComplete:false,createdAt:now,updatedAt:now});
+  }catch(error){
+   console.warn("Account created, but the initial Firestore profile could not be saved. Onboarding will retry it.",error);
+  }
+ };
  const logout=()=>signOut(auth);
  return <AuthContext.Provider value={{user,loading,ready:firebaseReady,login,register,logout}}>{children}</AuthContext.Provider>
 }
