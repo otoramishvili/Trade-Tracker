@@ -5,8 +5,11 @@ A modern trading journal built with Next.js and Firebase. Trade Tracker helps tr
 ## Features
 
 - Firebase email/password authentication
+- Guided trader onboarding and persistent profile preferences
+- Adaptive navigation for execution traders versus position traders
 - One trading account per user
 - Complete trade management with search, filters, sorting, and pagination
+- Fictional paper portfolio with leverage and unrealized P/L calculations
 - P/L, win rate, average RR, and profit-factor metrics
 - Monthly performance calendar
 - Responsive dark interface
@@ -24,6 +27,8 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+Run the regression checks with `npm test` and create a production build with `npm run build`.
 
 ## Firebase setup
 

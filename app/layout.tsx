@@ -5,6 +5,7 @@ import "./dashboard.css";
 import "./product.css";
 import "./focus.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { ProfileProvider } from "@/hooks/use-profile";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
@@ -18,7 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${manrope.variable}`}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider><ProfileProvider>{children}</ProfileProvider></AuthProvider>
       </body>
     </html>
   );

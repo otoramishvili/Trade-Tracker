@@ -11,7 +11,7 @@ export function useJournal() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const refresh = useCallback(async () => {
-    if (!user) { setLoading(false); return; }
+    if (!user) { setAccounts([]); setTrades([]); setError(""); setLoading(false); return; }
     try {
       setLoading(true);
       const [nextAccounts, nextTrades] = await Promise.all([getAccounts(user.uid), getTrades(user.uid)]);

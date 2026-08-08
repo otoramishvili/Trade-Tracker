@@ -38,8 +38,13 @@ export default function AccountsPage() {
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Could not save account"); }
   };
   const remove = async (account: Account) => {
-    if (!confirm(`Delete ${account.name}? Its trades will remain in your journal.`)) return;
-    await deleteAccount(account.id); await refresh();
+    if (trades.some((trade) => trade.accountId === account.id)) {
+      setError("Delete this account's trades before deleting the account.");
+      return;
+    }
+    if (!confirm(`Delete ${account.name}?`)) return;
+    try { setError(""); await deleteAccount(account.id); await refresh(); }
+    catch (caught) { setError(caught instanceof Error ? caught.message : "Could not delete account"); }
   };
 
   return <div className="page">
