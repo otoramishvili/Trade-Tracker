@@ -10,6 +10,7 @@ A modern trading journal built with Next.js and Firebase. Trade Tracker helps tr
 - One trading account per user
 - Complete trade management with search, filters, sorting, and pagination
 - Fictional paper portfolio with leverage and unrealized P/L calculations
+- Live CoinGecko pricing for supported crypto paper positions
 - P/L, win rate, average RR, and profit-factor metrics
 - Monthly performance calendar
 - Responsive dark interface
@@ -37,6 +38,10 @@ Run the regression checks with `npm test` and create a production build with `np
 3. Create the default Cloud Firestore database.
 4. Publish `firestore.rules` in the Firestore Rules editor.
 5. Add the six `NEXT_PUBLIC_FIREBASE_*` values to `.env.local`.
+
+CoinGecko works through its keyless public API by default. For more reliable rate limits, add an optional `COINGECKO_DEMO_API_KEY` to `.env.local`.
+
+Investor and position-trader portfolio reports are delivered through Resend. On Vercel Pro, `vercel.json` invokes the protected report route at 00:00 and 12:00 UTC; Daily and Weekly preferences are filtered inside the route.
 
 Cloud Storage is not required for the current MVP.
 

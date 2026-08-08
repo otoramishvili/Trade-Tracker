@@ -40,3 +40,28 @@ test("opens the trade modal from the global new-trade link", async () => {
   assert.match(trades, /setModal\(true\)/);
   assert.match(trades, /router\.replace\("\/dashboard\/trades"\)/);
 });
+
+test("uses live CoinGecko prices without persisting every refresh", async () => {
+  const [route, portfolio] = await Promise.all([
+    source("lib/coingecko.ts"),
+    source("app/dashboard/portfolio/page.tsx"),
+  ]);
+  assert.match(route, /api\.coingecko\.com\/api\/v3\/simple\/price/);
+  assert.match(route, /COINGECKO_DEMO_API_KEY/);
+  assert.match(portfolio, /window\.setInterval\(\(\) => void refreshLivePrices\(\), 30000\)/);
+  assert.match(portfolio, /calculate\(position, position\.market === "Crypto"/);
+  assert.doesNotMatch(portfolio, /updatePaperPosition\([^)]*livePrices/);
+  assert.match(portfolio, /currentPrice: editing \? values\.currentPrice : values\.entryPrice/);
+  assert.match(portfolio, /needsManualPrice && <label>Manual current price/);
+});
+
+test("protects and schedules twice-daily investor reports", async () => {
+  const [cron, vercel] = await Promise.all([
+    source("app/api/cron/portfolio-reports/route.ts"),
+    source("vercel.json"),
+  ]);
+  assert.match(cron, /Bearer \$\{process\.env\.CRON_SECRET\}/);
+  assert.match(cron, /style === "Investor" \|\| style === "Position trader"/);
+  assert.match(cron, /api\.resend\.com\/emails/);
+  assert.match(vercel, /"schedule": "0 \*\/12 \* \* \*"/);
+});

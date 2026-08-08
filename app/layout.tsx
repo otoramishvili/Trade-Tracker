@@ -4,6 +4,7 @@ import "./globals.css";
 import "./dashboard.css";
 import "./product.css";
 import "./focus.css";
+import "./live-prices.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ProfileProvider } from "@/hooks/use-profile";
 

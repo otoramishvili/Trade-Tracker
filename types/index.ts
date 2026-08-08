@@ -13,7 +13,7 @@ export type UserProfile = {
   baseCurrency: "USD" | "EUR" | "GBP" | "GEL";
   goal: "Journal real trades" | "Paper trade" | "Track investments" | "Improve discipline";
   emailDigest: boolean;
-  emailFrequency: "Daily" | "Weekly";
+  emailFrequency: "Every 12 hours" | "Daily" | "Weekly";
   onboardingComplete: boolean;
   createdAt: string;
   updatedAt: string;

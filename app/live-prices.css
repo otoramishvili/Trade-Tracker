@@ -1,0 +1,12 @@
+.live-price-note { align-items: center; }
+.live-price-note > div { flex: 1; }
+.live-price-note small { display: block; color: var(--accent); font-size: 9px; margin-top: 6px; }
+.live-price-note .button { flex: none; }
+.spin { animation: spin 1s linear infinite; }
+.position-prices span:last-child { align-items: flex-end; }
+.position-prices span small { font-size: 8px; }
+
+@media (max-width: 640px) {
+  .live-price-note { align-items: flex-start; flex-wrap: wrap; }
+  .live-price-note .button { width: 100%; }
+}

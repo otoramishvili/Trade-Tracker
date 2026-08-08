@@ -20,14 +20,14 @@ export default function ProfilePage() {
   const [traderStyles, setTraderStyles] = useState<TraderStyle[]>([]);
   const [selectedMarkets, setSelectedMarkets] = useState<Market[]>([]);
   const [emailDigest, setEmailDigest] = useState(false);
-  const [emailFrequency, setEmailFrequency] = useState<"Daily" | "Weekly">("Weekly");
+  const [emailFrequency, setEmailFrequency] = useState<"Every 12 hours" | "Daily" | "Weekly">("Every 12 hours");
 
   useEffect(() => {
     if (!profile) return;
     setTraderStyles(profile.traderStyles || []);
     setSelectedMarkets(profile.markets || []);
     setEmailDigest(profile.emailDigest || false);
-    setEmailFrequency(profile.emailFrequency || "Weekly");
+    setEmailFrequency(profile.emailFrequency || "Every 12 hours");
   }, [profile]);
 
   const toggle = <T,>(value: T, current: T[], setter: (next: T[]) => void) => {
@@ -76,7 +76,7 @@ export default function ProfilePage() {
       <section className="profile-card identity-card"><div className="profile-avatar"><UserRound /></div><div><small>YOUR ACCOUNT</small><h2>{profile.name || "Trader"}</h2><p>{user?.email}</p></div><div className="profile-badges"><span><ShieldCheck /> Firebase protected</span><span><Sparkles /> Personalized</span></div></section>
       <section className="profile-card"><small>TRADING STYLE</small><h3>How you approach markets</h3><div className="profile-choices">{styles.map((style) => <button type="button" key={style} className={traderStyles.includes(style) ? "selected" : ""} onClick={() => toggle(style, traderStyles, setTraderStyles)}>{style}</button>)}</div></section>
       <section className="profile-card"><small>MARKETS</small><h3>What you track</h3><div className="profile-choices">{markets.map((market) => <button type="button" key={market} className={selectedMarkets.includes(market) ? "selected" : ""} onClick={() => toggle(market, selectedMarkets, setSelectedMarkets)}>{market}</button>)}</div><div className="profile-detail"><span>Favorite instruments</span><strong>{profile.instruments?.join(", ") || "Not set"}</strong></div><div className="profile-detail"><span>Primary goal</span><strong>{profile.goal}</strong></div></section>
-      <section className="profile-card"><small>EMAIL PREFERENCES</small><h3>Market summaries</h3><label className="digest-toggle compact"><input type="checkbox" checked={emailDigest} onChange={(event) => { setEmailDigest(event.target.checked); setSaved(false); }} /><Mail /><span><strong>Receive an email digest</strong><small>Preference only until email delivery is connected.</small></span></label>{emailDigest && <label className="profile-select"><Bell /> Frequency<select value={emailFrequency} onChange={(event) => { setEmailFrequency(event.target.value as "Daily" | "Weekly"); setSaved(false); }}><option>Weekly</option><option>Daily</option></select></label>}</section>
+      <section className="profile-card"><small>EMAIL PREFERENCES</small><h3>Portfolio summaries</h3><label className="digest-toggle compact"><input type="checkbox" checked={emailDigest} onChange={(event) => { setEmailDigest(event.target.checked); setSaved(false); }} /><Mail /><span><strong>Receive an email digest</strong><small>Automatic portfolio valuation delivered through Resend.</small></span></label>{emailDigest && <label className="profile-select"><Bell /> Frequency<select value={emailFrequency} onChange={(event) => { setEmailFrequency(event.target.value as "Every 12 hours" | "Daily" | "Weekly"); setSaved(false); }}><option>Every 12 hours</option><option>Daily</option><option>Weekly</option></select></label>}</section>
     </div>
   </div>;
 }

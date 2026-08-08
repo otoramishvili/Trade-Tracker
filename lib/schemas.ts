@@ -11,7 +11,7 @@ export const onboardingSchema=z.object({
  baseCurrency:z.enum(["USD","EUR","GBP","GEL"]),
  goal:z.enum(["Journal real trades","Paper trade","Track investments","Improve discipline"]),
  emailDigest:z.boolean(),
- emailFrequency:z.enum(["Daily","Weekly"]),
+ emailFrequency:z.enum(["Every 12 hours","Daily","Weekly"]),
  accountName:z.string().min(2).max(30),
  startingBalance:z.coerce.number().nonnegative(),
 });
