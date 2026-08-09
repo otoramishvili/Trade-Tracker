@@ -1,9 +1,9 @@
 import { createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updatePassword, updateProfile } from "firebase/auth";
-import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "./config";
 export async function registerUser(displayName:string,email:string,password:string){const credential=await createUserWithEmailAndPassword(auth,email,password);await updateProfile(credential.user,{displayName});await setDoc(doc(db,"users",credential.user.uid),{uid:credential.user.uid,displayName,email,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});return credential.user;}
 export const loginUser=(email:string,password:string)=>signInWithEmailAndPassword(auth,email,password);
 export const logoutUser=()=>signOut(auth);
-export async function updateUserDisplayName(displayName:string){const user=auth.currentUser;if(!user)throw new Error("Not authenticated");await updateProfile(user,{displayName});await updateDoc(doc(db,"users",user.uid),{displayName,updatedAt:serverTimestamp()});}
+export async function updateUserDisplayName(displayName:string){const user=auth.currentUser;if(!user)throw new Error("Not authenticated");await updateProfile(user,{displayName});await setDoc(doc(db,"users",user.uid),{uid:user.uid,displayName,email:user.email??"",updatedAt:serverTimestamp()},{merge:true});}
 export async function changeUserPassword(currentPassword:string,newPassword:string){const user=auth.currentUser;if(!user||!user.email)throw new Error("Not authenticated");const credential=EmailAuthProvider.credential(user.email,currentPassword);await reauthenticateWithCredential(user,credential);await updatePassword(user,newPassword);}
 export function friendlyAuthError(error:unknown){const code=typeof error==="object"&&error&&"code" in error?String(error.code):"";if(code.includes("invalid-credential"))return "Email or password is incorrect.";if(code.includes("email-already-in-use"))return "An account already uses this email.";if(code.includes("weak-password"))return "Use a stronger password (at least 6 characters).";return "Authentication failed. Please try again.";}

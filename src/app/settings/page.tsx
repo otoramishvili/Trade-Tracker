@@ -8,7 +8,7 @@ import { changeUserPassword, updateUserDisplayName } from "@/lib/firebase/auth";
 export default function Settings(){return <AuthGuard><SettingsContent/></AuthGuard>}
 
 function SettingsContent(){
-  const {user}=useAuth();
+  const {user,refreshUser}=useAuth();
   const [name,setName]=useState(user?.displayName??"");
   const [profileBusy,setProfileBusy]=useState(false);
   const [profileMessage,setProfileMessage]=useState("");
@@ -18,7 +18,7 @@ function SettingsContent(){
   const [passwordMessage,setPasswordMessage]=useState("");
   const [passwordError,setPasswordError]=useState("");
 
-  async function saveProfile(event:FormEvent){event.preventDefault();const clean=name.trim();if(!clean){setProfileError("Display name cannot be empty.");return}setProfileBusy(true);setProfileError("");setProfileMessage("");try{await updateUserDisplayName(clean);setProfileMessage("Profile updated successfully.")}catch(error){console.error(error);setProfileError("Your profile could not be updated. Please try again.")}finally{setProfileBusy(false)}}
+  async function saveProfile(event:FormEvent){event.preventDefault();const clean=name.trim();if(!clean){setProfileError("Display name cannot be empty.");return}setProfileBusy(true);setProfileError("");setProfileMessage("");try{await updateUserDisplayName(clean);refreshUser();setProfileMessage("Profile updated successfully.")}catch(error){console.error(error);setProfileError("Your profile could not be updated. Please try again.")}finally{setProfileBusy(false)}}
   async function savePassword(event:FormEvent){event.preventDefault();setPasswordError("");setPasswordMessage("");if(passwords.next.length<6){setPasswordError("Your new password must contain at least 6 characters.");return}if(passwords.next!==passwords.confirm){setPasswordError("New passwords do not match.");return}if(passwords.current===passwords.next){setPasswordError("Choose a new password that differs from your current password.");return}setPasswordBusy(true);try{await changeUserPassword(passwords.current,passwords.next);setPasswords({current:"",next:"",confirm:""});setPasswordMessage("Password changed successfully.")}catch(error){console.error(error);const code=typeof error==="object"&&error&&"code" in error?String(error.code):"";setPasswordError(code.includes("invalid-credential")||code.includes("wrong-password")?"Your current password is incorrect.":code.includes("too-many-requests")?"Too many attempts. Please wait and try again.":"Your password could not be changed. Please try again.")}finally{setPasswordBusy(false)}}
 
   return <main className="app-page settings-page">
