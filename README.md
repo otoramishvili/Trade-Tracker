@@ -1,54 +1,16 @@
-# Trade Tracker
+# AI Trade Journal
 
-A modern trading journal built with Next.js and Firebase. Trade Tracker helps traders record executions, review performance, and identify repeatable patterns.
+Next.js + TypeScript + Firebase MVP for manually journaling trades or turning natural-language notes into a reviewable draft with Firebase AI Logic.
 
-## Features
+## Local setup
 
-- Firebase email/password authentication
-- Guided trader onboarding and persistent profile preferences
-- Adaptive navigation for execution traders versus position traders
-- One trading account per user
-- Complete trade management with search, filters, sorting, and pagination
-- Fictional paper portfolio with leverage and unrealized P/L calculations
-- Live CoinGecko pricing for supported crypto paper positions
-- P/L, win rate, average RR, and profit-factor metrics
-- Monthly performance calendar
-- Responsive dark interface
+1. Copy `.env.local.example` to `.env.local` and paste the Firebase Web App configuration values from Firebase Console.
+2. In Firebase Authentication, enable Email/Password.
+3. Create Cloud Firestore, then deploy `firestore.rules` and `firestore.indexes.json` with the Firebase CLI.
+4. In **AI Services → AI Logic**, choose the Gemini Developer API and complete setup.
+5. Configure Firebase App Check. For local development, register the debug token printed by the SDK/browser; for production, register a web attestation provider.
+6. Run `npm install`, then `npm run dev`.
 
-## Local development
+The default AI model is `gemini-3.6-flash`; override it with `NEXT_PUBLIC_FIREBASE_AI_MODEL`.
 
-```bash
-npm install
-```
-
-Copy `.env.example` to `.env.local`, add your Firebase Web App configuration, then run:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-Run the regression checks with `npm test` and create a production build with `npm run build`.
-
-## Firebase setup
-
-1. Register a Firebase Web App.
-2. Enable Email/Password authentication.
-3. Create the default Cloud Firestore database.
-4. Publish `firestore.rules` in the Firestore Rules editor.
-5. Add the six `NEXT_PUBLIC_FIREBASE_*` values to `.env.local`.
-
-CoinGecko works through its keyless public API by default. For more reliable rate limits, add an optional `COINGECKO_DEMO_API_KEY` to `.env.local`.
-
-Investor and position-trader portfolio reports are delivered through Resend. On Vercel Pro, `vercel.json` invokes the protected report route at 00:00 and 12:00 UTC; Daily and Weekly preferences are filtered inside the route.
-
-Cloud Storage is not required for the current MVP.
-
-## Vercel
-
-Import this repository with the Next.js preset and add the variables from `.env.example`. No custom server, output directory, or port configuration is required.
-
-## Security
-
-Never commit `.env.local`, Firebase Admin service-account credentials, or private keys.
+AI extraction never saves directly. It populates the shared editable form, and Firestore is written only after the authenticated user clicks **Save trade**.

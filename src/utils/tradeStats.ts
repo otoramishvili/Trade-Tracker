@@ -1,0 +1,2 @@
+import type { Trade } from "@/types/trade";
+export function tradeStats(trades:Trade[]){const wins=trades.filter(t=>t.outcome==="win").length,losses=trades.filter(t=>t.outcome==="loss").length,breakeven=trades.filter(t=>t.outcome==="breakeven").length;return{total:trades.length,wins,losses,breakeven,winRate:wins+losses?wins/(wins+losses)*100:0,totalPnl:trades.reduce((n,t)=>n+(t.pnl??0),0),pnlCount:trades.filter(t=>t.pnl!=null).length};}

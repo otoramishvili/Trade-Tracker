@@ -1,0 +1,3 @@
+import type { TradeDraft } from "@/types/trade";
+export type TradeErrors=Partial<Record<keyof TradeDraft,string>>;
+export function validateTrade(t:TradeDraft){const e:TradeErrors={};if(!t.date)e.date="Date is required.";if(!t.symbol.trim())e.symbol="Symbol is required.";if(!t.position)e.position="Position is required.";if(t.riskPercent!=null&&t.riskPercent<0)e.riskPercent="Risk must be 0 or greater.";if(t.lots!=null&&t.lots<=0)e.lots="Lots must be greater than 0.";if(t.entryPrice!=null&&t.entryPrice<=0)e.entryPrice="Entry price must be greater than 0.";if(t.exitPrice!=null&&t.exitPrice<=0)e.exitPrice="Exit price must be greater than 0.";return e;}
