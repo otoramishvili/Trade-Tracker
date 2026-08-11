@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 // Syntactically valid, non-operational fallbacks let Next.js prerender the UI
 // before a developer adds the real Firebase Web App configuration.
@@ -8,3 +8,11 @@ export const firebaseConfigured=Boolean(process.env.NEXT_PUBLIC_FIREBASE_API_KEY
 export const firebaseApp=getApps().length?getApp():initializeApp(firebaseConfig);
 export const auth=getAuth(firebaseApp);
 export const db=getFirestore(firebaseApp);
+
+// Firebase Auth normally defaults to local persistence in browsers, but making
+// it explicit prevents the session from silently falling back to in-memory
+// persistence when initialization and sign-in happen at the same time.
+export const authPersistenceReady =
+  typeof window === "undefined"
+    ? Promise.resolve()
+    : setPersistence(auth, browserLocalPersistence);

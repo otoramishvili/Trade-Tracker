@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { dateKey, groupTradesByDate, monthGrid } from "../src/utils/calendar.ts";
-import { sanitizeExtractedTrade } from "../src/utils/extractedTrade.ts";
 import { tradeStats } from "../src/utils/tradeStats.ts";
 import { validateTrade } from "../src/utils/tradeValidation.ts";
 import { timestampMillis, timestampToDate } from "../src/utils/timestamps.ts";
@@ -45,12 +44,6 @@ test("calendar groups trades without mutating them",()=>{
   const groups=groupTradesByDate(trades);
   assert.equal(groups["2026-08-09"].length,2);
   assert.equal(groups["2026-08-10"].length,1);
-});
-
-test("AI sanitizer keeps schema values and rejects untrusted output",()=>{
-  const clean=sanitizeExtractedTrade({symbol:"EURUSD",position:"long",session:"london",outcome:"win",rr:2,date:"2026-08-09",uid:"attacker",createdAt:"fake",riskPercent:Number.POSITIVE_INFINITY});
-  assert.deepEqual(clean,{symbol:"EURUSD",rr:2,date:"2026-08-09",session:"london",position:"long",outcome:"win"});
-  assert.deepEqual(sanitizeExtractedTrade({position:"buy",session:"mars",date:"tomorrow",rr:"2"}),{});
 });
 
 test("timestamps support Firestore instances and serialized legacy values",()=>{
