@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import type { TradeDraft } from "@/types/trade";
 import { validateTrade, type TradeErrors } from "@/utils/tradeValidation";
+import { ChartImagePicker } from "./ChartImagePicker";
 
 const numericFields = ["balanceBefore", "entryPrice", "exitPrice", "riskPercent", "riskAmount", "rr", "pnl", "pnlPercent", "lots"] as const;
 const labels: Record<string, string> = { balanceBefore: "Balance before trade", entryPrice: "Entry price", exitPrice: "Exit price", riskPercent: "Risk %", riskAmount: "Risk amount", rr: "R:R", pnl: "P&L", pnlPercent: "P&L %", lots: "Lots" };
@@ -10,16 +11,20 @@ const labels: Record<string, string> = { balanceBefore: "Balance before trade", 
 type TradeFormProps = {
   value: TradeDraft;
   onChange: (value: TradeDraft) => void;
-  onSubmit: (value: TradeDraft) => Promise<void>;
+  onSubmit: (value: TradeDraft, attachments: TradeFormAttachments) => Promise<void>;
   busy?: boolean;
   submitLabel?: string;
   hiddenFields?: readonly (keyof TradeDraft)[];
   onCancel: () => void;
 };
 
+export type TradeFormAttachments = { newChartFiles: File[]; removedChartImages: string[] };
+
 export function TradeForm({ value, onChange, onSubmit, busy = false, submitLabel = "Save trade", hiddenFields = [], onCancel }: TradeFormProps) {
   const [errors, setErrors] = useState<TradeErrors>({});
   const [saveError, setSaveError] = useState("");
+  const [newChartFiles, setNewChartFiles] = useState<File[]>([]);
+  const [removedChartImages, setRemovedChartImages] = useState<string[]>([]);
   const visibleNumericFields = numericFields.filter(key => !hiddenFields.includes(key));
   const set = (key: keyof TradeDraft, valueToSet: unknown) => onChange({ ...value, [key]: valueToSet });
 
@@ -30,7 +35,7 @@ export function TradeForm({ value, onChange, onSubmit, busy = false, submitLabel
     if (Object.keys(found).length) return;
     setSaveError("");
     try {
-      await onSubmit(value);
+      await onSubmit(value, { newChartFiles, removedChartImages });
     } catch (error) {
       console.error(error);
       setSaveError("Your trade could not be saved. Please try again.");
@@ -57,6 +62,7 @@ export function TradeForm({ value, onChange, onSubmit, busy = false, submitLabel
       <Field label="Emotion"><input value={value.emotion ?? ""} onChange={event => set("emotion", event.target.value)} /></Field>
       <Field label="Setup"><input value={value.setup ?? ""} onChange={event => set("setup", event.target.value)} /></Field>
     </div></fieldset>
+    <fieldset><legend>Charts</legend><ChartImagePicker existingImages={value.chartImages ?? []} files={newChartFiles} onFilesChange={setNewChartFiles} onRemoveExisting={url => { set("chartImages", (value.chartImages ?? []).filter(image => image !== url)); setRemovedChartImages(current => [...current, url]); }} /></fieldset>
     <fieldset><legend>Notes</legend><div className="form-grid">
       <Field label="Pre-trade notes"><textarea rows={4} value={value.preTradeNotes ?? ""} onChange={event => set("preTradeNotes", event.target.value)} /></Field>
       <Field label="Post-trade notes"><textarea rows={4} value={value.postTradeNotes ?? ""} onChange={event => set("postTradeNotes", event.target.value)} /></Field>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { TradeForm } from "@/components/trades/TradeForm";
+import { TradeForm, type TradeFormAttachments } from "@/components/trades/TradeForm";
 import { createTrade } from "@/lib/firebase/firestore";
 import { emptyTrade, type TradeDraft } from "@/types/trade";
 
@@ -20,11 +20,11 @@ function NewTradeContent() {
   const [draft, setDraft] = useState<TradeDraft>(emptyTrade());
   const [busy, setBusy] = useState(false);
 
-  async function save(value: TradeDraft) {
+  async function save(value: TradeDraft, attachments: TradeFormAttachments) {
     if (!user) return;
     setBusy(true);
     try {
-      const id = await createTrade(user.uid, value);
+      const id = await createTrade(user.uid, value, attachments.newChartFiles);
       router.push(`/trades/${id}`);
     } finally {
       setBusy(false);

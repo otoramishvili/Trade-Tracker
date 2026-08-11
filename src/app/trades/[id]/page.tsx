@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { DeleteTradeDialog } from "@/components/trades/DeleteTradeDialog";
+import { ChartGallery } from "@/components/trades/ChartGallery";
 import { deleteTrade, getTrade } from "@/lib/firebase/firestore";
 import type { Trade } from "@/types/trade";
 import { timestampToDate } from "@/utils/timestamps";
@@ -84,6 +85,7 @@ function Detail() {
         <section className="review-section"><header><div><span>02</span><h2>Trade context</h2></div><p>The setup and state of mind around execution.</p></header>{hasPsychology ? <div className="context-grid"><div><span>Setup</span><strong>{trade.setup || "Not recorded"}</strong></div><div><span>Emotion</span><strong>{trade.emotion || "Not recorded"}</strong></div></div> : <EmptySection text="No setup or emotion was recorded."/>}</section>
 
         <section className="review-section notes-section"><header><div><span>03</span><h2>Journal notes</h2></div><p>Your thinking before and after the trade.</p></header>{hasNotes ? <div className="notes-grid"><article><span>Before the trade</span><p>{trade.preTradeNotes || "No pre-trade notes."}</p></article><article><span>After the trade</span><p>{trade.postTradeNotes || "No post-trade notes."}</p></article></div> : <EmptySection text="No journal notes were added to this trade."/>}</section>
+        <ChartGallery images={trade.chartImages ?? []} />
       </div>
 
       <aside className="detail-side-column"><section className="trade-meta-card"><h3>Entry details</h3><dl><div><dt>Created via</dt><dd><span className="source-dot">✎</span>Manual Entry</dd></div><div><dt>Trade ID</dt><dd className="trade-id">{trade.id}</dd></div>{created && <div><dt>Created</dt><dd>{created.toLocaleDateString()}</dd></div>}{updated && <div><dt>Last updated</dt><dd>{updated.toLocaleDateString()}</dd></div>}</dl></section><Link className="side-edit-button" href={`/trades/${id}/edit`}>Edit this trade <span>→</span></Link></aside>
