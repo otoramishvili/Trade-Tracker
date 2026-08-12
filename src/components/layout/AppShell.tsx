@@ -11,6 +11,7 @@ const links = [
   { href: "/dashboard", label: "Overview", icon: "grid" },
   { href: "/trades", label: "Trade journal", icon: "book" },
   { href: "/calendar", label: "Calendar", icon: "calendar" },
+  { href: "/coach", label: "AI coach", icon: "grid" },
   { href: "/trades/new", label: "Add trade", icon: "plus" },
   { href: "/settings", label: "Settings", icon: "settings" },
 ] as const;

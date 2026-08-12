@@ -7,6 +7,8 @@ import { timestampMillis, timestampToDate } from "../src/utils/timestamps.ts";
 import { tradeCsvFilename, tradesToCsv } from "../src/utils/tradeCsv.ts";
 import { MAX_TRADING_ACCOUNTS, normalizeTradingAccounts } from "../src/utils/tradingAccounts.ts";
 import { tradeBelongsToAccount, tradesForAccount } from "../src/utils/tradeAccounts.ts";
+import { buildCoachEvidence } from "../src/utils/coachAnalytics.ts";
+import { interactionOutputText } from "../src/utils/geminiInteraction.ts";
 import type { Trade, TradeDraft } from "../src/types/trade.ts";
 
 test("trade validation requires only date, symbol, and position",()=>{
@@ -111,4 +113,20 @@ test("active trading account isolates its own trades",()=>{
   assert.deepEqual(tradesForAccount(trades,"").map(trade=>trade.id),["1","2","3"]);
   assert.equal(tradeBelongsToAccount(trades[1],"Apex 50K"),false);
   assert.equal(tradeBelongsToAccount(trades[1],""),true);
+});
+
+test("coach evidence calculates grouped performance without exposing chart URLs",()=>{
+  const trades=[{id:"1",date:"2026-08-11",symbol:"NQ",position:"long",session:"new_york",source:"manual",outcome:"win",pnl:200,rr:2,chartImages:["secret-url"]},{id:"2",date:"2026-08-10",symbol:"NQ",position:"short",session:"new_york",source:"manual",outcome:"loss",pnl:-100,rr:1}] as Trade[];
+  const evidence=buildCoachEvidence(trades,"Apex");
+  assert.equal(evidence.sampleSize,2);
+  assert.equal(evidence.winRate,50);
+  assert.equal(evidence.bySession.new_york.pnl,100);
+  assert.equal(evidence.summary.netR,1);
+  assert.equal(JSON.stringify(evidence).includes("secret-url"),false);
+});
+
+test("Gemini Interactions response parser reads only model text steps",()=>{
+  const answer=interactionOutputText({steps:[{type:"user_input",content:[{type:"text",text:"ignored"}]},{type:"thought",content:[{type:"text",text:"hidden"}]},{type:"model_output",content:[{type:"text",text:"Evidence-based answer"}]}]});
+  assert.equal(answer,"Evidence-based answer");
+  assert.equal(interactionOutputText({steps:[]}),"");
 });
