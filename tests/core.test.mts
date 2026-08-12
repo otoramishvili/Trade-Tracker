@@ -4,6 +4,7 @@ import { dateKey, groupTradesByDate, monthGrid } from "../src/utils/calendar.ts"
 import { tradeStats } from "../src/utils/tradeStats.ts";
 import { validateTrade } from "../src/utils/tradeValidation.ts";
 import { timestampMillis, timestampToDate } from "../src/utils/timestamps.ts";
+import { tradeCsvFilename, tradesToCsv } from "../src/utils/tradeCsv.ts";
 import type { Trade, TradeDraft } from "../src/types/trade.ts";
 
 test("trade validation requires only date, symbol, and position",()=>{
@@ -74,4 +75,16 @@ test("invalid timestamps are ignored instead of crashing trade pages",()=>{
   assert.equal(timestampToDate({toDate:"not a function"}),null);
   assert.equal(timestampToDate({toDate(){throw new Error("broken prototype")}}),null);
   assert.equal(timestampMillis({seconds:Number.NaN}),0);
+});
+
+test("CSV export includes every trade field and safely escapes spreadsheet content",()=>{
+  const trade={id:"trade-1",accountName:"Apex, 50K",date:"2026-08-12",dayOfWeek:"Wednesday",session:"new_york",symbol:"NQ",position:"long",balanceBefore:50000,riskPercent:1,riskAmount:100,rr:2,pnl:200,pnlPercent:0.4,lots:2,outcome:"win",entryPrice:21000,exitPrice:21020,entryTime:"14:30",exitTime:"14:42",emotion:"Calm",setup:"Breakout",preTradeNotes:"Line 1\nLine 2",postTradeNotes:"=DANGEROUS()",chartImages:["https://example.com/one.png","https://example.com/two.png"],source:"manual",createdAt:{seconds:1786521600,nanoseconds:0},updatedAt:{seconds:1786521660,nanoseconds:0}} as unknown as Trade;
+  const csv=tradesToCsv([trade]);
+  assert.match(csv,/"Account name"/);
+  assert.match(csv,/"Apex, 50K"/);
+  assert.match(csv,/"Line 1\nLine 2"/);
+  assert.match(csv,/"'=DANGEROUS\(\)"/);
+  assert.match(csv,/"https:\/\/example.com\/one.png\nhttps:\/\/example.com\/two.png"/);
+  assert.match(csv,/"2026-08-12T08:00:00.000Z"/);
+  assert.equal(tradeCsvFilename(new Date("2026-08-12T12:00:00Z")),"trade-journal-2026-08-12.csv");
 });
