@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { dateKey, groupTradesByDate, monthGrid } from "../src/utils/calendar.ts";
-import { tradeStats } from "../src/utils/tradeStats.ts";
+import { performanceStats, tradeStats } from "../src/utils/tradeStats.ts";
 import { validateTrade } from "../src/utils/tradeValidation.ts";
 import { timestampMillis, timestampToDate } from "../src/utils/timestamps.ts";
 import { tradeCsvFilename, tradesToCsv } from "../src/utils/tradeCsv.ts";
@@ -79,6 +79,15 @@ test("invalid timestamps are ignored instead of crashing trade pages",()=>{
   assert.equal(timestampToDate({toDate:"not a function"}),null);
   assert.equal(timestampToDate({toDate(){throw new Error("broken prototype")}}),null);
   assert.equal(timestampMillis({seconds:Number.NaN}),0);
+});
+
+test("dashboard performance metrics use only recorded P&L and outcomes",()=>{
+  const trades=[
+    {id:"1",date:"2026-08-09",symbol:"A",position:"long",source:"manual",outcome:"win",pnl:100,rr:2},
+    {id:"2",date:"2026-08-08",symbol:"B",position:"short",source:"manual",outcome:"loss",pnl:-40,rr:1},
+    {id:"3",date:"2026-08-07",symbol:"C",position:"long",source:"manual",outcome:"open",rr:4},
+  ] as Trade[];
+  assert.deepEqual(performanceStats(trades),{averageWin:100,averageLoss:-40,profitFactor:2.5,netR:1,averageR:1/3});
 });
 
 test("CSV export includes every trade field and safely escapes spreadsheet content",()=>{
