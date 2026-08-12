@@ -2,6 +2,7 @@ import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, serverTime
 import { auth, db } from "./config"; import type { Trade,TradeDraft } from "@/types/trade";
 import { timestampMillis } from "@/utils/timestamps";
 import { deleteChartUrls, deleteTradeCharts, uploadTradeCharts } from "./storage";
+import { normalizeTradingAccounts } from "@/utils/tradingAccounts";
 // Trade drafts are flat scalar objects. Only clean their top-level optional
 // fields so Firebase FieldValue sentinels (such as serverTimestamp) stay intact.
 export const cleanTradeData=(value:Record<string,unknown>):Record<string,unknown>=>Object.fromEntries(Object.entries(value).filter(([,field])=>field!==undefined&&field!==""));
@@ -11,3 +12,7 @@ export async function getTrades(uid:string){assertOwner(uid);const snap=await ge
 export async function getTrade(uid:string,id:string){assertOwner(uid);const snap=await getDoc(doc(db,"users",uid,"trades",id));return snap.exists()?({id:snap.id,...snap.data()} as Trade):null;}
 export async function updateTrade(uid:string,id:string,draft:TradeDraft,chartFiles:readonly File[]=[],removedChartImages:readonly string[]=[]){assertOwner(uid);const uploaded=await uploadTradeCharts(uid,id,chartFiles);try{await updateDoc(doc(db,"users",uid,"trades",id),cleanTradeData({...draft,chartImages:[...(draft.chartImages??[]),...uploaded],symbol:draft.symbol.trim().toUpperCase(),updatedAt:serverTimestamp()}));await deleteChartUrls(uid,removedChartImages)}catch(error){await deleteChartUrls(uid,uploaded);throw error;}}
 export async function deleteTrade(uid:string,id:string){assertOwner(uid);await deleteDoc(doc(db,"users",uid,"trades",id));await deleteTradeCharts(uid,id).catch(error=>console.warn("Trade deleted, but its chart images could not be removed.",error));}
+export async function getTradingAccounts(uid:string){assertOwner(uid);const snap=await getDoc(doc(db,"users",uid));const data=snap.data();return normalizeTradingAccounts(Array.isArray(data?.tradingAccounts)?data.tradingAccounts:[]);}
+export async function saveTradingAccounts(uid:string,accounts:readonly string[]){assertOwner(uid);const tradingAccounts=normalizeTradingAccounts(accounts);await setDoc(doc(db,"users",uid),{tradingAccounts,updatedAt:serverTimestamp()},{merge:true});return tradingAccounts;}
+export async function getTradingAccountState(uid:string){assertOwner(uid);const snap=await getDoc(doc(db,"users",uid));const data=snap.data();const accounts=normalizeTradingAccounts(Array.isArray(data?.tradingAccounts)?data.tradingAccounts:[]);const activeAccount=typeof data?.activeTradingAccount==="string"&&accounts.includes(data.activeTradingAccount)?data.activeTradingAccount:"";return {accounts,activeAccount};}
+export async function saveActiveTradingAccount(uid:string,accountName:string){assertOwner(uid);await setDoc(doc(db,"users",uid),{activeTradingAccount:accountName,updatedAt:serverTimestamp()},{merge:true});}

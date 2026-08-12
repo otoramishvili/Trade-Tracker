@@ -6,6 +6,8 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { getTrades } from "@/lib/firebase/firestore";
 import type { Trade } from "@/types/trade";
 import { dateKey, groupTradesByDate, monthGrid } from "@/utils/calendar";
+import { useTradingAccounts } from "@/components/accounts/TradingAccountProvider";
+import { tradesForAccount } from "@/utils/tradeAccounts";
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -15,6 +17,7 @@ export default function CalendarPage() {
 
 function CalendarView() {
   const { user } = useAuth();
+  const { activeAccount } = useTradingAccounts();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [loading, setLoading] = useState(true);
@@ -34,9 +37,10 @@ function CalendarView() {
 
   useEffect(() => { void load(); }, [load]);
   const days = useMemo(() => monthGrid(month), [month]);
-  const groups = useMemo(() => groupTradesByDate(trades), [trades]);
+  const visibleTrades = useMemo(() => tradesForAccount(trades, activeAccount), [trades, activeAccount]);
+  const groups = useMemo(() => groupTradesByDate(visibleTrades), [visibleTrades]);
   const monthPrefix = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}`;
-  const monthTrades = trades.filter(trade => trade.date.startsWith(monthPrefix));
+  const monthTrades = visibleTrades.filter(trade => trade.date.startsWith(monthPrefix));
   const monthPnl = monthTrades.reduce((sum, trade) => sum + (trade.pnl ?? 0), 0);
   const monthR = monthTrades.reduce((sum, trade) => sum + (trade.rr ?? 0) * (trade.outcome === "loss" ? -1 : trade.outcome === "win" ? 1 : 0), 0);
   const move = (offset: number) => setMonth(current => new Date(current.getFullYear(), current.getMonth() + offset, 1));
@@ -45,7 +49,7 @@ function CalendarView() {
   if (loading) return <main className="center-state"><span className="loader" />Loading calendar…</main>;
 
   return <main className="app-page calendar-page">
-    <div className="page-heading calendar-heading"><div><p className="eyebrow"><i />Monthly review</p><h1>Trading calendar</h1><p className="page-subtitle">See your consistency, activity and results at a glance.</p></div></div>
+    <div className="page-heading calendar-heading"><div><p className="eyebrow"><i />Monthly review</p><h1>Trading calendar</h1><p className="page-subtitle">{activeAccount ? `Calendar for ${activeAccount}.` : "Calendar across all accounts."}</p></div></div>
     {error ? <p className="alert">{error}</p> : <>
       <section className="calendar-summary">
         <div><span>Trades this month</span><strong>{monthTrades.length}</strong></div>

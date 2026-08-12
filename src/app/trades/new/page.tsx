@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { TradeForm, type TradeFormAttachments } from "@/components/trades/TradeForm";
 import { createTrade } from "@/lib/firebase/firestore";
 import { emptyTrade, type TradeDraft } from "@/types/trade";
+import { useTradingAccounts } from "@/components/accounts/TradingAccountProvider";
 
 const hiddenNewTradeFields = ["balanceBefore", "entryPrice", "exitPrice", "riskPercent", "pnlPercent"] as const;
 
@@ -16,9 +17,12 @@ export default function NewTrade() {
 
 function NewTradeContent() {
   const { user } = useAuth();
+  const { activeAccount } = useTradingAccounts();
   const router = useRouter();
   const [draft, setDraft] = useState<TradeDraft>(emptyTrade());
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => { if (activeAccount) setDraft(current => current.accountName ? current : { ...current, accountName: activeAccount }); }, [activeAccount]);
 
   async function save(value: TradeDraft, attachments: TradeFormAttachments) {
     if (!user) return;

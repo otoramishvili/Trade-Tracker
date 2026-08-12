@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useTradingAccounts } from "@/components/accounts/TradingAccountProvider";
 import type { TradeDraft } from "@/types/trade";
 import { validateTrade, type TradeErrors } from "@/utils/tradeValidation";
 import { ChartImagePicker } from "./ChartImagePicker";
@@ -21,6 +22,7 @@ type TradeFormProps = {
 export type TradeFormAttachments = { newChartFiles: File[]; removedChartImages: string[] };
 
 export function TradeForm({ value, onChange, onSubmit, busy = false, submitLabel = "Save trade", hiddenFields = [], onCancel }: TradeFormProps) {
+  const { accounts } = useTradingAccounts();
   const [errors, setErrors] = useState<TradeErrors>({});
   const [saveError, setSaveError] = useState("");
   const [newChartFiles, setNewChartFiles] = useState<File[]>([]);
@@ -45,6 +47,7 @@ export function TradeForm({ value, onChange, onSubmit, busy = false, submitLabel
   return <form className="trade-form" onSubmit={submit}>
     {saveError && <p className="alert" role="alert">{saveError}</p>}
     <fieldset><legend>Basic</legend><div className="form-grid">
+      <Field label="Trading account"><select value={value.accountName ?? ""} onChange={event => set("accountName", event.target.value)}><option value="">Not specified</option>{value.accountName && !accounts.includes(value.accountName) && <option value={value.accountName}>{value.accountName} (archived)</option>}{accounts.map(account => <option key={account} value={account}>{account}</option>)}</select></Field>
       <Field label="Date" error={errors.date}><input type="date" value={value.date} onChange={event => set("date", event.target.value)} /></Field>
       <Field label="Session"><select value={value.session ?? ""} onChange={event => set("session", event.target.value)}><option value="">Not specified</option><option value="asia">Asia</option><option value="london">London</option><option value="new_york">New York</option><option value="overlap">Overlap</option><option value="other">Other</option></select></Field>
       <Field label="Symbol" error={errors.symbol}><input placeholder="EURUSD" value={value.symbol} onChange={event => set("symbol", event.target.value.toUpperCase())} /></Field>

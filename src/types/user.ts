@@ -1,2 +1,2 @@
 import type { Timestamp } from "firebase/firestore";
-export interface UserProfile { uid:string; displayName:string; email:string; createdAt?:Timestamp; updatedAt?:Timestamp; }
+export interface UserProfile { uid:string; displayName:string; email:string; tradingAccounts?:string[]; activeTradingAccount?:string; createdAt?:Timestamp; updatedAt?:Timestamp; }

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { logoutUser } from "@/lib/firebase/auth";
+import { useTradingAccounts } from "@/components/accounts/TradingAccountProvider";
 
 const links = [
   { href: "/dashboard", label: "Overview", icon: "grid" },
@@ -18,6 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
+  const { accounts, activeAccount, loading: accountsLoading, selectAccount } = useTradingAccounts();
   const [open, setOpen] = useState(false);
 
   const active = (href: string) => href === "/trades" ? pathname === href || (/^\/trades\/.+/.test(pathname) && pathname !== "/trades/new") : pathname === href;
@@ -26,6 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className={`sidebar-scrim ${open ? "visible" : ""}`} onClick={() => setOpen(false)} />
     <aside className={`sidebar ${open ? "open" : ""}`}>
       <div className="sidebar-brand"><span className="brand-mark">JT</span><div><b>Journal Trade</b><small>Performance journal</small></div></div>
+      <div className="account-switcher"><label htmlFor="active-trading-account">Active account</label><select id="active-trading-account" value={activeAccount} disabled={accountsLoading} onChange={event => void selectAccount(event.target.value)}><option value="">All accounts</option>{accounts.map(account => <option value={account} key={account}>{account}</option>)}</select><Link href="/settings#trading-accounts" onClick={() => setOpen(false)}>Manage accounts</Link></div>
       <nav className="sidebar-nav" aria-label="Application navigation">
         <p>Workspace</p>
         {links.map(link => <Link key={link.href} href={link.href} className={active(link.href) ? "active" : ""} onClick={() => setOpen(false)}><Icon name={link.icon}/><span>{link.label}</span>{link.href === "/trades/new" && <kbd>N</kbd>}</Link>)}

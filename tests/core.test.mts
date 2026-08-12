@@ -5,6 +5,8 @@ import { tradeStats } from "../src/utils/tradeStats.ts";
 import { validateTrade } from "../src/utils/tradeValidation.ts";
 import { timestampMillis, timestampToDate } from "../src/utils/timestamps.ts";
 import { tradeCsvFilename, tradesToCsv } from "../src/utils/tradeCsv.ts";
+import { MAX_TRADING_ACCOUNTS, normalizeTradingAccounts } from "../src/utils/tradingAccounts.ts";
+import { tradeBelongsToAccount, tradesForAccount } from "../src/utils/tradeAccounts.ts";
 import type { Trade, TradeDraft } from "../src/types/trade.ts";
 
 test("trade validation requires only date, symbol, and position",()=>{
@@ -87,4 +89,26 @@ test("CSV export includes every trade field and safely escapes spreadsheet conte
   assert.match(csv,/"https:\/\/example.com\/one.png\nhttps:\/\/example.com\/two.png"/);
   assert.match(csv,/"2026-08-12T08:00:00.000Z"/);
   assert.equal(tradeCsvFilename(new Date("2026-08-12T12:00:00Z")),"trade-journal-2026-08-12.csv");
+});
+
+test("trading accounts are trimmed, unique, and capped at twenty",()=>{
+  const values=["  Apex 50K ","apex 50k","",...Array.from({length:25},(_,index)=>`Account ${index+1}`)];
+  const accounts=normalizeTradingAccounts(values);
+  assert.equal(MAX_TRADING_ACCOUNTS,20);
+  assert.equal(accounts.length,20);
+  assert.equal(accounts[0],"Apex 50K");
+  assert.equal(accounts[1],"Account 1");
+  assert.equal(accounts.at(-1),"Account 19");
+});
+
+test("active trading account isolates its own trades",()=>{
+  const trades=[
+    {id:"1",date:"2026-08-12",symbol:"NQ",position:"long",source:"manual",accountName:"Apex 50K"},
+    {id:"2",date:"2026-08-12",symbol:"ES",position:"short",source:"manual",accountName:"Topstep 100K"},
+    {id:"3",date:"2026-08-12",symbol:"GC",position:"long",source:"manual"},
+  ] as Trade[];
+  assert.deepEqual(tradesForAccount(trades,"Apex 50K").map(trade=>trade.id),["1"]);
+  assert.deepEqual(tradesForAccount(trades,"").map(trade=>trade.id),["1","2","3"]);
+  assert.equal(tradeBelongsToAccount(trades[1],"Apex 50K"),false);
+  assert.equal(tradeBelongsToAccount(trades[1],""),true);
 });

@@ -9,9 +9,12 @@ import { ChartGallery } from "@/components/trades/ChartGallery";
 import { deleteTrade, getTrade } from "@/lib/firebase/firestore";
 import type { Trade } from "@/types/trade";
 import { timestampToDate } from "@/utils/timestamps";
+import { useTradingAccounts } from "@/components/accounts/TradingAccountProvider";
+import { tradeBelongsToAccount } from "@/utils/tradeAccounts";
 export default function TradeDetail() { return <AuthGuard><Detail /></AuthGuard>; }
 function Detail() {
     const { user } = useAuth();
+    const { activeAccount } = useTradingAccounts();
     const { id } = useParams<{
         id: string;
     }>();
@@ -23,7 +26,13 @@ function Detail() {
     const [deleting, setDeleting] = useState(false);
     const load = useCallback(async () => { if (!user)
         return; try {
-        setTrade(await getTrade(user.uid, id));
+        const loadedTrade = await getTrade(user.uid, id);
+        if (loadedTrade && !tradeBelongsToAccount(loadedTrade, activeAccount)) {
+            setTrade(null);
+            setError("This trade belongs to a different trading account.");
+        } else {
+            setTrade(loadedTrade);
+        }
     }
     catch (err) {
         console.error(err);
@@ -31,7 +40,7 @@ function Detail() {
     }
     finally {
         setLoading(false);
-    } }, [user, id]);
+    } }, [user, id, activeAccount]);
     useEffect(() => { void load(); }, [load]);
     async function remove() { if (!user)
         return; setDeleting(true); try {
