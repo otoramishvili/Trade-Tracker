@@ -1,29 +1,34 @@
 import Link from "next/link";
 
-export default function Home() {
-  return <main className="marketing">
-    <section className="hero">
-      <div className="hero-copy">
-        <div className="eyebrow"><i />Built for deliberate traders</div>
-        <h1>Your trades.<br /><em>Finally organized.</em></h1>
-        <p>Record every trade in a structured journal, review your decisions, and build a clearer picture of your performance.</p>
-        <div className="actions"><Link className="button" href="/register">Start your journal <span>→</span></Link><Link className="text-link" href="/#how">See how it works</Link></div>
-        <div className="trust-row"><span>Structured records</span><span>Private workspace</span><span>No trading advice</span></div>
-      </div>
-      <div className="hero-product">
-        <div className="product-window">
-          <div className="window-top"><i /><i /><i /><span>Trade journal · New entry</span></div>
-          <div className="mock-prompt"><small>TRADE SUMMARY</small><p>Record the market, direction, session, result, timing, setup, and lessons from each trade.</p><span className="mock-action">Ready to save</span></div>
-          <div className="mock-result"><div><small>SYMBOL</small><b>EURUSD</b></div><div><small>POSITION</small><b className="up">↗ LONG</b></div><div><small>SESSION</small><b>LONDON</b></div><div><small>RESULT</small><b className="up">+2.0R</b></div></div>
-        </div>
-        <div className="float-card"><span>Your record</span><b>Every decision in context</b></div>
-      </div>
-    </section>
-    <section className="section process" id="how">
-      <div className="section-title"><div><p className="eyebrow"><i />The workflow</p><h2>From execution to insight<br />in three clean steps.</h2></div><p>A focused process for capturing what happened and learning from every trading session.</p></div>
-      <div className="steps">{[["01", "Record", "Add the trade details, result, timing, setup, and context while they are fresh."], ["02", "Review", "Keep each entry consistent so patterns are easier to recognize over time."], ["03", "Improve", "Use your history, calendar, and performance overview to guide your review process."]].map(([number, title, description]) => <article className="step-card" key={number}><span>{number}</span><div className="step-icon">{number === "01" ? "⌁" : number === "02" ? "◎" : "✓"}</div><h3>{title}</h3><p>{description}</p></article>)}</div>
-    </section>
-    <section className="section closing"><p className="eyebrow"><i />Clarity compounds</p><h2>A useful trading history starts with one honest entry.</h2><Link className="button" href="/register">Create your journal <span>→</span></Link></section>
-    <footer className="disclaimer">Journal Trade is a record-keeping tool. It does not provide financial advice, investment recommendations, signals, or trade execution.</footer>
-  </main>;
-}
+const features=[
+  ["01","Fast trade entry","Capture the account, market, session, result, setup, notes, and chart screenshots without a bloated workflow."],
+  ["02","Focused analytics","See net P&L, win rate, R performance, averages, and recent results for the account you are reviewing."],
+  ["03","Monthly review","Read your month at a glance, then open any trading day to inspect the trades behind the number."],
+  ["04","Multiple accounts","Keep up to twenty trading accounts separate and switch the entire journal context in one place."],
+  ["05","Complete history","Search, filter, sort, view, edit, delete, and export your journal whenever you need the raw record."],
+  ["06","Charts in context","Attach up to three screenshots to a trade and open them full-screen during review."],
+];
+
+export default function Home(){return <main className="marketing">
+  <section className="hero">
+    <div className="hero-copy"><div className="eyebrow"><i/>Built for deliberate traders</div><h1>Your trades.<br/><em>Finally organized.</em></h1><p>Record every trade in a structured journal, review your decisions, and build a clearer picture of your performance.</p><div className="actions"><Link className="button" href="/register">Start your journal <span>→</span></Link><Link className="text-link" href="#product">Explore the product</Link></div><div className="trust-row"><span>Structured records</span><span>Private workspace</span><span>No trading advice</span></div></div>
+    <div className="hero-product"><div className="product-window"><div className="window-top"><i/><i/><i/><span>Journal Trade · Performance</span></div><div className="landing-dashboard"><div className="landing-metrics"><article><span>NET P&amp;L</span><strong className="up">+1,284</strong><small>12 recorded trades</small></article><article><span>WIN RATE</span><strong>64.3%</strong><small>9 wins · 5 losses</small></article><article><span>NET R</span><strong className="up">+8.4R</strong><small>+0.60R average</small></article></div><div className="landing-bars">{[32,58,42,78,36,65,88,48,72,92,55,82].map((height,index)=><i key={index} className={index===2||index===4||index===7?"down":""} style={{height:`${height}%`}}/>)}</div></div></div><div className="float-card"><span>Current account</span><b>Evaluation 50K · 14 trades</b></div></div>
+  </section>
+
+  <section className="proof-strip" aria-label="Product highlights"><div><strong>One journal</strong><span>for every trading account</span></div><div><strong>Clear evidence</strong><span>instead of scattered notes</span></div><div><strong>Private data</strong><span>inside your Firebase account</span></div><div><strong>CSV export</strong><span>when you need your records</span></div></section>
+
+  <section className="section product-section" id="product"><div className="section-title"><div><p className="eyebrow"><i/>Everything in context</p><h2>A complete workspace for<br/>the review after the trade.</h2></div><p>Built around the journal loop: capture accurately, review consistently, and find patterns in your own behavior.</p></div><div className="feature-grid">{features.map(([number,title,description])=><article key={number}><span>{number}</span><div className="feature-icon">{number}</div><h3>{title}</h3><p>{description}</p></article>)}</div></section>
+
+  <section className="section showcase"><div className="showcase-copy"><p className="eyebrow"><i/>Performance overview</p><h2>Know how you are doing in seconds.</h2><p>The dashboard prioritizes the metrics that matter, while recent results and account-level context stay close enough to investigate.</p><ul><li>Net P&amp;L and R performance</li><li>Win rate and outcome sample</li><li>Average wins, losses, and profit factor</li></ul><Link href="/register">Build your performance history <span>→</span></Link></div><div className="dashboard-preview"><header><span>Performance overview</span><b>Evaluation 50K</b></header><div className="preview-primary"><article><span>NET P&amp;L</span><strong>+1,284</strong></article><article><span>WIN RATE</span><strong>64.3%</strong></article><article><span>NET R</span><strong>+8.4R</strong></article></div><div className="preview-chart"><span>RECENT PERFORMANCE</span><div>{[45,72,38,86,54,92,67,78].map((height,index)=><i key={index} className={index===2?"down":""} style={{height:`${height}%`}}/>)}</div></div></div></section>
+
+  <section className="section showcase reverse"><div className="calendar-preview"><header><button>←</button><strong>August 2026</strong><button>→</button></header><div className="mini-weekdays">{["M","T","W","T","F","S","S"].map((day,index)=><span key={`${day}${index}`}>{day}</span>)}</div><div className="mini-calendar">{Array.from({length:35},(_,index)=><div key={index} className={index===11?"active":""}><span>{index<5?27+index:index-4}</span>{[7,8,11,15,18,22].includes(index)&&<><b className={index===8||index===18?"negative":"positive"}>{index===8||index===18?"-0.8R":"+1.6R"}</b><small>{index%2?"2 trades":"1 trade"}</small></>}</div>)}</div></div><div className="showcase-copy"><p className="eyebrow"><i/>Calendar review</p><h2>See the rhythm of an entire month.</h2><p>Daily P&L, net R, and trade count make good and difficult stretches visible. Select a day to open the trades behind it.</p><ul><li>Clear positive, negative, and neutral days</li><li>Compact monthly summary</li><li>Full-screen desktop workspace</li></ul></div></section>
+
+  <section className="section process" id="how"><div className="section-title"><div><p className="eyebrow"><i/>The workflow</p><h2>From execution to insight<br/>in three clean steps.</h2></div><p>A focused process for capturing what happened and learning from every trading session.</p></div><div className="steps">{[["01","Record","Add the trade details, result, timing, setup, and context while they are fresh."],["02","Review","Keep each entry consistent so patterns are easier to recognize over time."],["03","Improve","Use your history, calendar, and performance overview to guide your review process."]].map(([number,title,description])=><article className="step-card" key={number}><span>{number}</span><div className="step-icon">{number==="01"?"↗":number==="02"?"◎":"✓"}</div><h3>{title}</h3><p>{description}</p></article>)}</div></section>
+
+  <section className="section privacy-section"><div><p className="eyebrow"><i/>Private by design</p><h2>Your journal belongs to you.</h2><p>Authentication and ownership rules keep every journal tied to its user. The product is built for reviewing your own evidence—not selling signals or telling you what to trade.</p><Link className="button secondary" href="/register">Create a private workspace</Link></div><div className="privacy-points"><article><span>01</span><div><h3>Account ownership</h3><p>Trades and settings stay scoped to the authenticated Firebase user.</p></div></article><article><span>02</span><div><h3>No financial advice</h3><p>Journal Trade records and analyzes journal data. It does not execute or recommend trades.</p></div></article><article><span>03</span><div><h3>Portable records</h3><p>Export your trade history to CSV whenever you want an offline copy.</p></div></article></div></section>
+
+  <section className="section faq-section"><div className="section-title"><div><p className="eyebrow"><i/>Common questions</p><h2>Before you start journaling.</h2></div></div><div className="faq-list"><details open><summary>Can I keep different trading accounts separate?<span>+</span></summary><p>Yes. Add up to twenty accounts, switch from the sidebar, and review trades and statistics in the selected account context.</p></details><details><summary>Can I add chart screenshots?<span>+</span></summary><p>Yes. Each trade supports up to three chart images with a full-screen viewer for focused review.</p></details><details><summary>Does Journal Trade give signals?<span>+</span></summary><p>No. It is a record-keeping and analytics product for studying your own decisions and results.</p></details><details><summary>Can I export my trades?<span>+</span></summary><p>Yes. The trade journal can export the available trade fields as a CSV file.</p></details></div></section>
+
+  <section className="section closing"><p className="eyebrow"><i/>Clarity compounds</p><h2>A useful trading history starts with one honest entry.</h2><p>Build a record you can actually review.</p><div className="actions"><Link className="button" href="/register">Create your journal <span>→</span></Link><Link className="button secondary" href="/login">Log in</Link></div></section>
+  <footer className="landing-footer"><div><Link className="brand" href="/"><span>JT</span><div>Journal Trade<small>Trade with context</small></div></Link><p>A focused workspace for recording and reviewing trading performance.</p></div><nav><div><b>Product</b><a href="#product">Features</a><a href="#how">How it works</a></div><div><b>Account</b><Link href="/register">Create account</Link><Link href="/login">Log in</Link></div></nav><small>Journal Trade is a record-keeping tool. It does not provide financial advice, recommendations, signals, or trade execution.</small></footer>
+</main>}
