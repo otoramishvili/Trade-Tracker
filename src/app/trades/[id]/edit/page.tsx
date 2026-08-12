@@ -9,6 +9,8 @@ import { TradeForm } from "@/components/trades/TradeForm";
 import { getTrade, updateTrade } from "@/lib/firebase/firestore";
 import type { TradeDraft } from "@/types/trade";
 
+const hiddenEditTradeFields = ["balanceBefore", "entryPrice", "exitPrice", "riskPercent", "pnlPercent"] as const;
+
 export default function EditTrade() {
   return <AuthGuard><Edit /></AuthGuard>;
 }
@@ -39,5 +41,5 @@ function Edit() {
   useEffect(() => { void load(); }, [load]);
   if (loading) return <main className="center-state"><span className="loader" />Loading trade…</main>;
   if (error || !draft) return <main className="app-page"><div className="empty-state"><div className="empty-icon">?</div><h2>Unable to edit trade</h2><p>{error || "This trade is unavailable."}</p><Link className="button" href="/trades">Back to journal</Link></div></main>;
-  return <main className="app-page"><div className="page-heading"><div><p className="eyebrow"><i />Journal</p><h1>Edit {draft.symbol}</h1><p className="page-subtitle">Update the fields below and save your changes.</p></div></div><TradeForm value={draft} onChange={setDraft} busy={busy} submitLabel="Update trade" onCancel={() => router.push(`/trades/${id}`)} onSubmit={async (value, attachments) => { if (!user) return; setBusy(true); try { await updateTrade(user.uid, id, value, attachments.newChartFiles, attachments.removedChartImages); router.push(`/trades/${id}`); } finally { setBusy(false); } }} /></main>;
+  return <main className="app-page"><div className="page-heading"><div><p className="eyebrow"><i />Journal</p><h1>Edit {draft.symbol}</h1><p className="page-subtitle">Update the fields below and save your changes.</p></div></div><TradeForm value={draft} onChange={setDraft} busy={busy} submitLabel="Update trade" hiddenFields={hiddenEditTradeFields} onCancel={() => router.push(`/trades/${id}`)} onSubmit={async (value, attachments) => { if (!user) return; setBusy(true); try { await updateTrade(user.uid, id, value, attachments.newChartFiles, attachments.removedChartImages); router.push(`/trades/${id}`); } finally { setBusy(false); } }} /></main>;
 }
