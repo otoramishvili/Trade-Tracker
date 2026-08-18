@@ -11,6 +11,7 @@ const links = [
   { href: "/dashboard", label: "Overview", icon: "grid" },
   { href: "/trades", label: "Trade journal", icon: "book" },
   { href: "/calendar", label: "Calendar", icon: "calendar" },
+  { href: "/connections", label: "Connections", icon: "grid" },
   { href: "/coach", label: "AI coach", icon: "grid" },
   { href: "/trades/new", label: "Add trade", icon: "plus" },
   { href: "/settings", label: "Settings", icon: "settings" },
@@ -32,13 +33,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="account-switcher"><label htmlFor="active-trading-account">Active account</label><select id="active-trading-account" value={activeAccount} disabled={accountsLoading} onChange={event => void selectAccount(event.target.value)}><option value="">All accounts</option>{accounts.map(account => <option value={account} key={account}>{account}</option>)}</select><Link href="/settings#trading-accounts" onClick={() => setOpen(false)}>Manage accounts</Link></div>
       <nav className="sidebar-nav" aria-label="Application navigation">
         <p>Workspace</p>
-        {links.map(link => <Link key={link.href} href={link.href} className={active(link.href) ? "active" : ""} onClick={() => setOpen(false)}><Icon name={link.icon}/><span>{link.label}</span>{link.href === "/trades/new" && <kbd>N</kbd>}</Link>)}
+        {links.filter(link => link.href !== "/trades/new" || accounts.length > 0).map(link => <Link key={link.href} href={link.href} className={active(link.href) ? "active" : ""} onClick={() => setOpen(false)}><Icon name={link.icon}/><span>{link.label}</span>{link.href === "/trades/new" && <kbd>N</kbd>}</Link>)}
       </nav>
       <div className="sidebar-note"><span>Private by default</span><p>Your trades are secured inside your Firebase account.</p></div>
       <div className="sidebar-user"><div className="avatar">{(user?.displayName || user?.email || "U").slice(0, 1).toUpperCase()}</div><div className="user-copy"><b>{user?.displayName || "Trader"}</b><small>{user?.email}</small></div><button aria-label="Log out" title="Log out" onClick={async()=>{await logoutUser();router.push("/")}}><Icon name="logout"/></button></div>
     </aside>
     <div className="shell-main">
-      <header className="mobile-bar"><button aria-label="Open navigation" onClick={() => setOpen(true)}><Icon name="menu"/></button><Link href="/dashboard"><span className="brand-mark">JT</span> Journal Trade</Link><Link className="mobile-add" href="/trades/new">+</Link></header>
+      <header className="mobile-bar"><button aria-label="Open navigation" onClick={() => setOpen(true)}><Icon name="menu"/></button><Link href="/dashboard"><span className="brand-mark">JT</span> Journal Trade</Link>{accounts.length > 0 ? <Link className="mobile-add" href="/trades/new">+</Link> : <Link className="mobile-add" href="/settings#trading-accounts">◇</Link>}</header>
       {children}
     </div>
   </div>;

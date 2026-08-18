@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authenticatedFirebaseUid } from "@/lib/server/firebaseAuth";
 import { interactionOutputText } from "@/utils/geminiInteraction";
 
 const MODEL = "gemini-3.6-flash";
 
-async function authenticated(request: NextRequest) {
-  const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  const firebaseApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-  if (!token || !firebaseApiKey) return false;
-  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(firebaseApiKey)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken: token }), cache: "no-store" });
-  return response.ok;
-}
-
 export async function POST(request: NextRequest) {
   try {
-    if (!await authenticated(request)) return NextResponse.json({ error: "Your session could not be verified. Please log in again." }, { status: 401 });
+    if (!await authenticatedFirebaseUid(request)) return NextResponse.json({ error: "Your session could not be verified. Please log in again." }, { status: 401 });
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return NextResponse.json({ error: "Gemini is not configured. Add GEMINI_API_KEY to .env.local and restart the app." }, { status: 503 });
     const body = await request.json() as { question?: unknown; evidence?: unknown };

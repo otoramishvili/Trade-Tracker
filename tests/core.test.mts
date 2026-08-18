@@ -11,16 +11,19 @@ import { buildCoachEvidence } from "../src/utils/coachAnalytics.ts";
 import { interactionOutputText } from "../src/utils/geminiInteraction.ts";
 import type { Trade, TradeDraft } from "../src/types/trade.ts";
 
-test("trade validation requires only date, symbol, and position",()=>{
-  const valid:TradeDraft={date:"2026-08-09",symbol:" eurusd ",position:"long",source:"manual"};
+test("trade validation requires an account, date, symbol, and position",()=>{
+  const valid:TradeDraft={accountName:"Apex 50K",date:"2026-08-09",symbol:" eurusd ",position:"long",source:"manual"};
   assert.deepEqual(validateTrade(valid),{});
+  assert.deepEqual(validateTrade({...valid,accountName:""}).accountName,"Trading account is required.");
   assert.deepEqual(validateTrade({...valid,date:"not-a-date"}).date,"Enter a valid date.");
+  assert.deepEqual(validateTrade({...valid,date:"2026-02-31"}).date,"Enter a valid date.");
+  assert.equal(validateTrade({...valid,date:"2028-02-29"}).date,undefined);
   assert.deepEqual(validateTrade({...valid,symbol:""}).symbol,"Symbol is required.");
   assert.deepEqual(validateTrade({...valid,position:""}).position,"Position is required.");
 });
 
 test("trade validation rejects invalid optional numbers",()=>{
-  const base:TradeDraft={date:"2026-08-09",symbol:"NAS100",position:"short",source:"manual"};
+  const base:TradeDraft={accountName:"Tradeify 50K",date:"2026-08-09",symbol:"NAS100",position:"short",source:"manual"};
   assert.ok(validateTrade({...base,riskPercent:-1}).riskPercent);
   assert.ok(validateTrade({...base,lots:0}).lots);
   assert.ok(validateTrade({...base,entryPrice:Number.NaN}).entryPrice);

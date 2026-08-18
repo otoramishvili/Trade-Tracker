@@ -4,7 +4,16 @@ service cloud.firestore {
     function owns(userId) { return request.auth != null && request.auth.uid == userId; }
     match /users/{userId} {
       allow read, create, update, delete: if owns(userId);
-      match /trades/{tradeId} { allow read, create, update, delete: if owns(userId); }
+      match /trades/{tradeId} {
+        allow create: if owns(userId)
+          && request.resource.data.accountName is string
+          && request.resource.data.accountName.size() > 0
+          && request.resource.data.accountName in get(/databases/$(database)/documents/users/$(userId)).data.tradingAccounts;
+        allow read, update, delete: if owns(userId);
+      }
+      match /connections/{connectionId} {
+        allow read, create, update, delete: if owns(userId);
+      }
     }
   }
 }
